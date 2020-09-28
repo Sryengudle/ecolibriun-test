@@ -11,7 +11,7 @@ const buttonStyle = {
 };
 
 function formBuilderContainer(props) {
-    let { formDetails, componentOptions, radioOption } = props;
+    let { formDetails, componentOptions } = props;
     return (
         <>
             {formDetails && Array.isArray(formDetails) && formDetails.map((component, idx) => {
@@ -67,11 +67,10 @@ function formBuilderContainer(props) {
 }
 
 const mapStateToProps = state => {
+    console.log('inside map state to props....', state.formReducer);
     return {
         formDetails: state.formReducer.formDetails,
         componentOptions: state.formReducer.componentOptions,
-        radioOption: state.formReducer.radioOption,
-        formReducer: state.formReducer,
     }
 }
 
