@@ -3,7 +3,6 @@ import * as ActionType from '../ActionTypes';
 const initialState = {
     formDetails: [],
     componentOptions: ["Select Dropdwon", "Text", "Radio", "Static"],
-    radioOption: []
 }
 const formReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -18,19 +17,29 @@ const formReducer = (state = initialState, action) => {
                 formDetails: state.formDetails.filter((s, sidx) => action.payload !== sidx)
             }
         case ActionType.ADD_RADIO:
-            return {
-                ...state,
-                [action.idx]: state && state[action.idx] ? state[action.idx].concat([{ value: '' }]) : [{ value: '' }]
-            }
-        case ActionType.CHANGE_RADIO:
-            const change_radio = state[action.payload.idx].map((option, sidx) => {
-                if (action.payload.index !== sidx) return option;
-                return { ...option, value: action.payload.value };
+            const add_radio1 = state.formDetails.map((form, sidx) => {
+                if (action.idx !== sidx) return form;
+                return { ...form, [action.idx]: state.formDetails[action.idx][action.idx].concat([{ value: '' }]) };
             });
-
             return {
                 ...state,
-                [action.payload.idx]: change_radio
+                formDetails: add_radio1
+            }
+
+        case ActionType.CHANGE_RADIO:
+            const change_radio = state.formDetails.map((form, sidx) => {
+                if (action.payload.idx !== sidx) return form;
+                return form[action.payload.idx].map((option, index) => {
+                    if(action.payload.index == index){
+                        let updatedValue = form[action.payload.idx][index];
+                        updatedValue.value = action.payload.value
+                        return { ...form, [action.payload.idx]: updatedValue }; 
+                    }
+                })
+            });
+            console.log('change_radio', change_radio)
+            return {
+                ...state
             }
         case ActionType.TEXT:
             let text = action.payload.name;
@@ -79,20 +88,11 @@ const formReducer = (state = initialState, action) => {
                 formDetails: change_form_details
             }
         case ActionType.DOWNLOAD_JSON:
-            let radio_data = [];
-            state.formDetails.map((form, index) => {
-                radio_data.push(JSON.stringify(state[index]));
-            })
             let from_data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.formDetails));
             let a = document.createElement('a');
             a.href = 'data:' + from_data;
             a.download = 'from_data.json';
             a.click();
-            let radio_form = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(radio_data));
-            let b = document.createElement('a');
-            b.href = 'data:' + radio_form[0];
-            b.download = 'radio_data.json';
-            b.click();
             return state;
         default:
             return state;
